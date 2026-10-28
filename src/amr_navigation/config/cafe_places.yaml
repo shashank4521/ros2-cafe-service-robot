@@ -1,0 +1,21 @@
+# Named places in the café map (frame: map). Used by delivery.py and cafe_goals.py.
+#   x, y  : where the robot's rear axle (base_link) stops, metres
+#   yaw   : direction the robot faces, degrees (0 = east/kitchen, 90 = north, -90 = south)
+#   role  : counter (pick up orders), table (deliver), charger, home
+#
+# Table stops are 1.05 m from the table centre: the robot turns around its rear
+# axle and its front corners swing out ~0.65 m, which must stay clear of the
+# table no-go zone. Check a new place by sending the robot there once
+# (cafe_goals.py <name>) before using it in deliveries.
+
+counter: {x: 4.60, y: 0.00, yaw: 0, role: counter}
+
+table_1: {x: -4.30, y: 1.05, yaw: 90, role: table}
+table_2: {x: -1.50, y: 1.05, yaw: 90, role: table}
+table_3: {x: 1.30, y: 1.05, yaw: 90, role: table}
+table_4: {x: -4.30, y: -1.05, yaw: -90, role: table}
+table_5: {x: -1.50, y: -1.05, yaw: -90, role: table}
+table_6: {x: 1.30, y: -1.05, yaw: -90, role: table}
+
+charger: {x: 4.50, y: -2.75, yaw: -90, role: charger}
+home: {x: 0.00, y: 0.00, yaw: 0, role: home}

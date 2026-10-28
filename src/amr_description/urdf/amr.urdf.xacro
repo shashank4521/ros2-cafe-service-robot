@@ -1,0 +1,672 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
+       name="amr">
+
+  <!-- Phase 2.1 / 2.2 physical dimensions -->
+  <xacro:property name="chassis_length" value="1.500"/>
+  <xacro:property name="chassis_width"  value="1.000"/>
+  <xacro:property name="chassis_height" value="0.300"/>
+  <xacro:property name="ground_clearance" value="0.025"/>
+
+  <!-- Drive wheel dimensions -->
+  <xacro:property name="wheel_radius" value="0.125"/>
+  <xacro:property name="wheel_width" value="0.080"/>
+  <xacro:property name="wheel_separation" value="0.800"/>
+  <xacro:property name="drive_axle_x" value="0.000"/>
+
+<!-- Primary robot reference frame -->
+  <!-- Origin: drive axle centerline, ground reference -->
+  <link name="base_link"/>
+
+  <!-- Main chassis -->
+  <link name="chassis_link">
+    <inertial>
+  <origin xyz="0.008929 0 0.166295"
+          rpy="0 0 0"/>
+  <mass value="112.0"/>
+  <inertia
+    ixx="5.445471"
+    ixy="0.0"
+    ixz="-0.252455"
+    iyy="11.390709"
+    iyz="0.0"
+    izz="15.111905"/>
+</inertial>
+    <visual>
+      <origin xyz="0 0 ${ground_clearance + chassis_height / 2}"
+              rpy="0 0 0"/>
+      <geometry>
+        <box size="${chassis_length}
+                   ${chassis_width}
+                   ${chassis_height}"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 ${ground_clearance + chassis_height / 2}"
+              rpy="0 0 0"/>
+      <geometry>
+        <box size="${chassis_length}
+                   ${chassis_width}
+                   ${chassis_height}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Fixed base-to-chassis connection -->
+  <joint name="base_to_chassis"
+         type="fixed">
+    <parent link="base_link"/>
+    <child link="chassis_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Left drive wheel -->
+  <link name="left_wheel_link">
+     <inertial>
+  <origin xyz="0 0 0"
+          rpy="0 0 0"/>
+  <mass value="15.0"/>
+  <inertia
+    ixx="0.066594"
+    ixy="0.0"
+    ixz="0.0"
+    iyy="0.117188"
+    iyz="0.0"
+    izz="0.066594"/>
+</inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry>
+        <cylinder radius="${wheel_radius}"
+                  length="${wheel_width}"/>
+      </geometry>
+    </visual>
+
+    <!-- Sphere collision: a cylinder makes Gazebo put the ground contact on
+         the inner rim (effective track 0.72 m instead of 0.80 m), so the
+         robot turned ~11% more than odometry reported. A sphere touches
+         the floor at the wheel centre line, like a real tyre. -->
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="${wheel_radius}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="left_wheel_joint"
+         type="continuous">
+    <parent link="base_link"/>
+    <child link="left_wheel_link"/>
+    <origin xyz="${drive_axle_x}
+                 ${wheel_separation / 2}
+                 ${wheel_radius}"
+            rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <!-- Right drive wheel -->
+  <link name="right_wheel_link">
+    <inertial>
+  <origin xyz="0 0 0"
+          rpy="0 0 0"/>
+  <mass value="15.0"/>
+  <inertia
+    ixx="0.066594"
+    ixy="0.0"
+    ixz="0.0"
+    iyy="0.117188"
+    iyz="0.0"
+    izz="0.066594"/>
+</inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry>
+        <cylinder radius="${wheel_radius}"
+                  length="${wheel_width}"/>
+      </geometry>
+    </visual>
+
+    <!-- Sphere collision: a cylinder makes Gazebo put the ground contact on
+         the inner rim (effective track 0.72 m instead of 0.80 m), so the
+         robot turned ~11% more than odometry reported. A sphere touches
+         the floor at the wheel centre line, like a real tyre. -->
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="${wheel_radius}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="right_wheel_joint"
+         type="continuous">
+    <parent link="base_link"/>
+    <child link="right_wheel_link"/>
+    <origin xyz="${drive_axle_x}
+                 ${-wheel_separation / 2}
+                 ${wheel_radius}"
+            rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+
+    <!-- Four fixed support casters -->
+  <xacro:property name="caster_radius" value="0.075"/>
+  <xacro:property name="caster_width" value="0.050"/>
+
+  <!-- Front-left caster -->
+  <link name="front_left_caster_link">
+   <inertial>
+  <origin xyz="0 0 0"
+          rpy="0 0 0"/>
+  <mass value="2.0"/>
+  <inertia
+    ixx="0.003229"
+    ixy="0.0"
+    ixz="0.0"
+    iyy="0.003229"
+    iyz="0.0"
+    izz="0.005625"/>
+</inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${caster_radius}"
+                   length="${caster_width}"/>
+      </geometry>
+    </visual>
+    <!-- Sphere touching the floor (link origin is caster_radius above it).
+         Zero friction below makes it act like a free swivel caster. -->
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="${caster_radius}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="front_left_caster_joint"
+         type="fixed">
+    <parent link="base_link"/>
+    <child link="front_left_caster_link"/>
+    <origin xyz="0.300 0.450 ${caster_radius}"
+            rpy="0 0 0"/>
+  </joint>
+
+  <!-- Front-right caster -->
+  <link name="front_right_caster_link">
+    <inertial>
+  <origin xyz="0 0 0"
+          rpy="0 0 0"/>
+  <mass value="2.0"/>
+  <inertia
+    ixx="0.003229"
+    ixy="0.0"
+    ixz="0.0"
+    iyy="0.003229"
+    iyz="0.0"
+    izz="0.005625"/>
+</inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${caster_radius}"
+                   length="${caster_width}"/>
+      </geometry>
+    </visual>
+    <!-- Sphere touching the floor (link origin is caster_radius above it).
+         Zero friction below makes it act like a free swivel caster. -->
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="${caster_radius}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="front_right_caster_joint"
+         type="fixed">
+    <parent link="base_link"/>
+    <child link="front_right_caster_link"/>
+    <origin xyz="0.300 -0.450 ${caster_radius}"
+            rpy="0 0 0"/>
+  </joint>
+
+  <!-- Rear-left caster -->
+  <link name="rear_left_caster_link">
+    <inertial>
+  <origin xyz="0 0 0"
+          rpy="0 0 0"/>
+  <mass value="2.0"/>
+  <inertia
+    ixx="0.003229"
+    ixy="0.0"
+    ixz="0.0"
+    iyy="0.003229"
+    iyz="0.0"
+    izz="0.005625"/>
+</inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${caster_radius}"
+                   length="${caster_width}"/>
+      </geometry>
+    </visual>
+    <!-- Sphere touching the floor (link origin is caster_radius above it).
+         Zero friction below makes it act like a free swivel caster. -->
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="${caster_radius}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="rear_left_caster_joint"
+         type="fixed">
+    <parent link="base_link"/>
+    <child link="rear_left_caster_link"/>
+    <origin xyz="-0.600 0.450 ${caster_radius}"
+            rpy="0 0 0"/>
+  </joint>
+
+  <!-- Rear-right caster -->
+  <link name="rear_right_caster_link">
+    <inertial>
+  <origin xyz="0 0 0"
+          rpy="0 0 0"/>
+  <mass value="2.0"/>
+  <inertia
+    ixx="0.003229"
+    ixy="0.0"
+    ixz="0.0"
+    iyy="0.003229"
+    iyz="0.0"
+    izz="0.005625"/>
+</inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${caster_radius}"
+                   length="${caster_width}"/>
+      </geometry>
+    </visual>
+    <!-- Sphere touching the floor (link origin is caster_radius above it).
+         Zero friction below makes it act like a free swivel caster. -->
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="${caster_radius}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="rear_right_caster_joint"
+         type="fixed">
+    <parent link="base_link"/>
+    <child link="rear_right_caster_link"/>
+    <origin xyz="-0.600 -0.450 ${caster_radius}"
+            rpy="0 0 0"/>
+   </joint>
+ 
+          
+               <!-- Front LiDAR -->
+  <!-- Casters: frictionless contact -->
+  <gazebo reference="front_left_caster_link">
+    <mu1>0.0</mu1>
+    <mu2>0.0</mu2>
+  </gazebo>
+  <gazebo reference="front_right_caster_link">
+    <mu1>0.0</mu1>
+    <mu2>0.0</mu2>
+  </gazebo>
+  <gazebo reference="rear_left_caster_link">
+    <mu1>0.0</mu1>
+    <mu2>0.0</mu2>
+  </gazebo>
+  <gazebo reference="rear_right_caster_link">
+    <mu1>0.0</mu1>
+    <mu2>0.0</mu2>
+  </gazebo>
+
+  <link name="front_lidar_link"/>
+
+  <joint name="front_lidar_joint"
+         type="fixed">
+    <parent link="base_link"/>
+    <child link="front_lidar_link"/>
+    <origin xyz="0.700 0.000 0.280"
+            rpy="0 0 0"/>
+  </joint>
+
+  <gazebo reference="front_lidar_link">
+    <sensor name="front_lidar" type="gpu_lidar">
+      <gz_frame_id>front_lidar_link</gz_frame_id>
+      <topic>front_lidar</topic>
+      <update_rate>10</update_rate>
+
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>540</samples>
+            <resolution>1</resolution>
+            <min_angle>-2.356194</min_angle>
+            <max_angle>2.356194</max_angle>
+          </horizontal>
+
+          <vertical>
+            <samples>1</samples>
+            <resolution>1</resolution>
+            <min_angle>0</min_angle>
+            <max_angle>0</max_angle>
+          </vertical>
+        </scan>
+
+        <range>
+          <min>0.10</min>
+          <max>12.0</max>
+          <resolution>0.01</resolution>
+        </range>
+      </lidar>
+
+      <alwaysOn>1</alwaysOn>
+      <visualize>true</visualize>
+    </sensor>
+  </gazebo> 
+       <!-- Rear LiDAR -->
+  <link name="rear_lidar_link"/>
+
+  <joint name="rear_lidar_joint"
+         type="fixed">
+    <parent link="base_link"/>
+    <child link="rear_lidar_link"/>
+    <origin xyz="-0.700 0.000 0.280"
+            rpy="0 0 3.14159265359"/>
+  </joint>
+
+  <gazebo reference="rear_lidar_link">
+    <sensor name="rear_lidar" type="gpu_lidar">
+      <gz_frame_id>rear_lidar_link</gz_frame_id>
+      <topic>rear_lidar</topic>
+      <update_rate>10</update_rate>
+
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>540</samples>
+            <resolution>1</resolution>
+            <min_angle>-2.356194</min_angle>
+            <max_angle>2.356194</max_angle>
+          </horizontal>
+
+          <vertical>
+            <samples>1</samples>
+            <resolution>1</resolution>
+            <min_angle>0</min_angle>
+            <max_angle>0</max_angle>
+          </vertical>
+        </scan>
+
+        <range>
+          <min>0.10</min>
+          <max>12.0</max>
+          <resolution>0.01</resolution>
+        </range>
+      </lidar>
+
+      <alwaysOn>1</alwaysOn>
+      <visualize>true</visualize>
+    </sensor>
+  </gazebo>
+    <!-- IMU -->
+<link name="imu_link"/>
+
+<joint name="imu_joint"
+       type="fixed">
+  <parent link="base_link"/>
+  <child link="imu_link"/>
+  <origin xyz="0 0 0.350"
+          rpy="0 0 0"/>
+</joint>
+
+<gazebo reference="base_link">
+  <sensor name="imu_sensor" type="imu">
+    <topic>imu</topic>
+    <gz_frame_id>imu_link</gz_frame_id>
+    <update_rate>100</update_rate>
+    <visualize>true</visualize>
+    <pose>0 0 0.350 0 0 0</pose>
+    <imu>
+      <angular_velocity>
+        <x>
+          <noise type="gaussian">
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </x>
+        <y>
+          <noise type="gaussian">
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </y>
+        <z>
+          <noise type="gaussian">
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </z>
+      </angular_velocity>
+    </imu>
+  </sensor>
+</gazebo>
+    <!-- Front-Left ToF -->
+<link name="tof_front_left_link"/>
+
+<joint name="tof_front_left_joint"
+       type="fixed">
+  <parent link="base_link"/>
+  <child link="tof_front_left_link"/>
+  <origin xyz="0.650 0.400 0.150"
+          rpy="0 0 0.6"/>
+</joint>
+
+<gazebo reference="tof_front_left_link">
+  <sensor name="tof_front_left" type="gpu_lidar">
+    <gz_frame_id>tof_front_left_link</gz_frame_id>
+    <topic>tof_front_left</topic>
+    <update_rate>20</update_rate>
+
+    <lidar>
+      <scan>
+        <horizontal>
+          <samples>5</samples>
+          <resolution>1</resolution>
+          <min_angle>-0.218166</min_angle>
+          <max_angle>0.218166</max_angle>
+        </horizontal>
+
+        <vertical>
+          <samples>1</samples>
+          <resolution>1</resolution>
+          <min_angle>0</min_angle>
+          <max_angle>0</max_angle>
+        </vertical>
+      </scan>
+
+      <range>
+        <min>0.02</min>
+        <max>3.0</max>
+        <resolution>0.01</resolution>
+      </range>
+    </lidar>
+
+    <visualize>true</visualize>
+  </sensor>
+</gazebo>
+
+    <!-- Front-Right ToF -->
+    <link name="tof_front_right_link"/>
+
+    <joint name="tof_front_right_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="tof_front_right_link"/>
+      <origin xyz="0.650 -0.400 0.150" rpy="0 0 -0.6"/>
+    </joint>
+
+    <gazebo reference="tof_front_right_link">
+      <sensor name="tof_front_right" type="gpu_lidar">
+        <gz_frame_id>tof_front_right_link</gz_frame_id>
+        <topic>tof_front_right</topic>
+        <update_rate>20</update_rate>
+
+        <lidar>
+          <scan>
+            <horizontal>
+              <samples>5</samples>
+              <resolution>1</resolution>
+              <min_angle>-0.218166</min_angle>
+              <max_angle>0.218166</max_angle>
+            </horizontal>
+
+            <vertical>
+              <samples>1</samples>
+              <resolution>1</resolution>
+              <min_angle>0</min_angle>
+              <max_angle>0</max_angle>
+            </vertical>
+          </scan>
+
+          <range>
+            <min>0.02</min>
+            <max>3.0</max>
+            <resolution>0.01</resolution>
+          </range>
+        </lidar>
+
+        <visualize>true</visualize>
+      </sensor>
+    </gazebo>
+
+    
+    <!-- Rear-Left ToF -->
+    <link name="tof_rear_left_link"/>
+
+    <joint name="tof_rear_left_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="tof_rear_left_link"/>
+      <origin xyz="-0.600 0.400 0.150" rpy="0 0 0.6"/>
+    </joint>
+
+    <gazebo reference="tof_rear_left_link">
+      <sensor name="tof_rear_left" type="gpu_lidar">
+        <gz_frame_id>tof_rear_left_link</gz_frame_id>
+        <topic>tof_rear_left</topic>
+        <update_rate>20</update_rate>
+
+        <lidar>
+          <scan>
+            <horizontal>
+              <samples>5</samples>
+              <resolution>1</resolution>
+              <min_angle>-0.218166</min_angle>
+              <max_angle>0.218166</max_angle>
+            </horizontal>
+
+            <vertical>
+              <samples>1</samples>
+              <resolution>1</resolution>
+              <min_angle>0</min_angle>
+              <max_angle>0</max_angle>
+            </vertical>
+          </scan>
+
+          <range>
+            <min>0.02</min>
+            <max>3.0</max>
+            <resolution>0.01</resolution>
+          </range>
+        </lidar>
+
+        <visualize>true</visualize>
+      </sensor>
+    </gazebo>
+
+    
+    <!-- Rear-Right ToF -->
+    <link name="tof_rear_right_link"/>
+
+    <joint name="tof_rear_right_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="tof_rear_right_link"/>
+      <origin xyz="-0.600 -0.400 0.150" rpy="0 0 -0.6"/>
+    </joint>
+
+    <gazebo reference="tof_rear_right_link">
+      <sensor name="tof_rear_right" type="gpu_lidar">
+        <gz_frame_id>tof_rear_right_link</gz_frame_id>
+        <topic>tof_rear_right</topic>
+        <update_rate>20</update_rate>
+
+        <lidar>
+          <scan>
+            <horizontal>
+              <samples>5</samples>
+              <resolution>1</resolution>
+              <min_angle>-0.218166</min_angle>
+              <max_angle>0.218166</max_angle>
+            </horizontal>
+
+            <vertical>
+              <samples>1</samples>
+              <resolution>1</resolution>
+              <min_angle>0</min_angle>
+              <max_angle>0</max_angle>
+            </vertical>
+          </scan>
+
+          <range>
+            <min>0.02</min>
+            <max>3.0</max>
+            <resolution>0.01</resolution>
+          </range>
+        </lidar>
+
+        <visualize>true</visualize>
+      </sensor>
+    </gazebo>
+
+
+<ros2_control name="GazeboSimSystem" type="system">
+    <hardware>
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+    </hardware>
+
+    <joint name="left_wheel_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <joint name="right_wheel_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+  </ros2_control>
+
+      
+
+  
+    <gazebo>
+  <plugin filename="libgz_ros2_control-system.so"
+          name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+    <parameters>$(find amr_description)/config/controllers.yaml</parameters>
+  </plugin>
+</gazebo>
+
+
+</robot>

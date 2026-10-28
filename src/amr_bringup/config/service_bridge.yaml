@@ -1,0 +1,71 @@
+# Gazebo -> ROS bridges for the service robot.
+# Camera topics use the same names as the realsense2_camera driver
+# (camera_namespace:='' camera_name:=camera), so configs carry over to hardware.
+
+- ros_topic_name: /clock
+  gz_topic_name: /clock
+  ros_type_name: rosgraph_msgs/msg/Clock
+  gz_type_name: gz.msgs.Clock
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /scan
+  gz_topic_name: /scan
+  ros_type_name: sensor_msgs/msg/LaserScan
+  gz_type_name: gz.msgs.LaserScan
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /imu
+  gz_topic_name: /imu
+  ros_type_name: sensor_msgs/msg/Imu
+  gz_type_name: gz.msgs.IMU
+  direction: GZ_TO_ROS
+
+# RGB-D camera (RealSense D435i-like)
+- ros_topic_name: /camera/color/image_raw
+  gz_topic_name: /camera/image
+  ros_type_name: sensor_msgs/msg/Image
+  gz_type_name: gz.msgs.Image
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /camera/color/camera_info
+  gz_topic_name: /camera/camera_info
+  ros_type_name: sensor_msgs/msg/CameraInfo
+  gz_type_name: gz.msgs.CameraInfo
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /camera/depth/image_rect_raw
+  gz_topic_name: /camera/depth_image
+  ros_type_name: sensor_msgs/msg/Image
+  gz_type_name: gz.msgs.Image
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /camera/depth/color/points
+  gz_topic_name: /camera/points
+  ros_type_name: sensor_msgs/msg/PointCloud2
+  gz_type_name: gz.msgs.PointCloudPacked
+  direction: GZ_TO_ROS
+
+# ToF sensors (small 5-beam scans; tof_scan_to_range turns them into Range)
+- ros_topic_name: /tof_front_left
+  gz_topic_name: /tof_front_left
+  ros_type_name: sensor_msgs/msg/LaserScan
+  gz_type_name: gz.msgs.LaserScan
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /tof_front_right
+  gz_topic_name: /tof_front_right
+  ros_type_name: sensor_msgs/msg/LaserScan
+  gz_type_name: gz.msgs.LaserScan
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /tof_rear_left
+  gz_topic_name: /tof_rear_left
+  ros_type_name: sensor_msgs/msg/LaserScan
+  gz_type_name: gz.msgs.LaserScan
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /tof_rear_right
+  gz_topic_name: /tof_rear_right
+  ros_type_name: sensor_msgs/msg/LaserScan
+  gz_type_name: gz.msgs.LaserScan
+  direction: GZ_TO_ROS

@@ -1,0 +1,43 @@
+ekf_filter_node:
+  ros__parameters:
+    use_sim_time: true
+    frequency: 30.0
+    two_d_mode: true
+
+    publish_tf: true
+
+    map_frame: map
+    odom_frame: odom
+    base_link_frame: base_link
+    world_frame: odom
+
+    process_noise_covariance: [0.001, 0.001, 0.001,
+                           0.001, 0.001, 0.001,
+                           0.001, 0.001, 0.001,
+                           0.001, 0.001, 0.001,
+                           0.001, 0.001, 0.001]
+
+    odom0: /diff_drive_controller/odom
+    # Wheel odometry: fuse velocities (vx, vy=0, vyaw), not absolute pose.
+    # Absolute x/y/yaw from wheels made the EKF ignore the IMU completely.
+    odom0_config: [false, false, false,
+                   false, false, false,
+                   true,  true,  false,
+                   false, false, true,
+                   false, false, false]
+    odom0_differential: false
+    odom0_relative: false
+    odom0_queue_size: 5
+
+    imu0: /imu
+    # IMU: yaw rate. Gyro noise (0.01 rad/s) is 10x lower than wheel yaw
+    # rate noise (0.1 rad/s), so turning is driven mostly by the IMU, which
+    # stays right when wheels slip.
+    imu0_config: [false, false, false,
+                  false, false, false,
+                  false, false, false,
+                  false, false, true,
+                  false, false, false]
+    imu0_differential: false
+    imu0_relative: false
+    imu0_queue_size: 10

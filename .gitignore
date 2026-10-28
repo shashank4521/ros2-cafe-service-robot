@@ -1,0 +1,30 @@
+# colcon build output
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.pyc
+
+# Backups and scratch files
+backups/
+*.bak*
+*.before_*
+*backup*
+*corrupted*
+src/amr_description/np
+frames_*.gv
+frames_*.pdf
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Root copies of images (tracked versions live in docs/images)
+/cafe_map.png
+/warehouse_map.png
+/slam_map_after_merger_fix.png
+/dashboard_wheel_fault_example.png
